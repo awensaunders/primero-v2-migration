@@ -147,15 +147,8 @@ class DataExporter
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/AbcSize
 
-  def valid_key?(key)
-    return false if key.is_a?(Integer) || key.include?('-') || key.include?(' ') || !key.match?('^[a-zA-Z]') || key.include?("'")
-
-    true
-  end
-
   def key_to_ruby(key)
-    # TODO: This doesn't handle the case where the key has both ' and " in it
-    valid_key?(key) ? key : (key.include?("'") ? "\"#{key}\"" : "'#{key}'")
+    "'#{ key.gsub(/'/, "\'") }'"
   end
 
   def parse_date_and_location_fields(object, data_hash)
