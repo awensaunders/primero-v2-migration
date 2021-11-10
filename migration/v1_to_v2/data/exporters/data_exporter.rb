@@ -148,7 +148,7 @@ class DataExporter
   # rubocop:enable Metrics/AbcSize
 
   def key_to_ruby(key)
-    "'#{ key.gsub(/'/, "\'") }'"
+    "'#{ key.gsub(/'/, "\\'") }'"
   end
 
   def parse_date_and_location_fields(object, data_hash)
