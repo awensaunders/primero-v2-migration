@@ -95,9 +95,14 @@ class AttachmentExporter < DataExporter
       name = value.is_a?(String) ? value : value.file_name
 
       @json_to_export[type][@record_id][form] << {
-        record_type: @record_type.to_s, record_id: @record_id, field_name: form,
-        file_name: name, date: value.try(:date), comments: value.try(:comments),
-        is_current: value.try(:is_current) || false, description: value.try(:document_description),
+        record_type: @record_type.to_s,
+        record_id: @record_id,
+        field_name: form,
+        file_name: name,
+        date: value.try(:date),
+        comments: value.try(:comments),
+        is_current: value.try(:is_current) || false,
+        description: value.try(:document_description),
         path: "/#{@record_id}/#{form}/#{name}"
       }
     end
@@ -186,7 +191,6 @@ class AttachmentExporter < DataExporter
          end
        end
      end
-
 
      attachments.each_slice(10) do |slice|
        slice.each do |form, file|
