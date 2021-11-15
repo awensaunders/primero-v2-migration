@@ -19,7 +19,7 @@ class AttachmentExporter < DataExporter
     'other_documents' => 'other_documents'
   }.freeze
 
-  def initialize(options = {})
+  def initialize(options = { batch_size: 50 })
     super(options)
     @indent = 0
     @json_to_export = {}
