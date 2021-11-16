@@ -159,9 +159,9 @@ class AttachmentExporter < DataExporter
   end
 
   ATTACHMENT_IMPORTER_TEMPLATE = ERB.new(<<~RUBY)
-    puts "Inserting <%= get_attachment_type(data[:path]) %> to <%= data[:record_id] >"
+    puts "Inserting <%= get_attachment_type(data[:path]) %> to <%= data[:record_id] %>"
     attachment = Attachment.new(<%= data.except(:path, :field_name, :date) %>)
-    <% if date.present? %>attachment.date = "<%= date.strftime('%Y-%m-%d') %>"<% end %>
+    <% if data[:date].present? %>attachment.date = "<%= data[:date].strftime('%Y-%m-%d') %>"<% end %>
     attachment.record_type = <%= data[:record_type] %>
     attachment.attachment_type = "<%= get_attachment_type(path) %>"
     attachment.field_name = "<%= get_field_name(form_name) %>"
