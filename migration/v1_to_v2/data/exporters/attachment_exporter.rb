@@ -155,19 +155,19 @@ class AttachmentExporter < DataExporter
   def add_date_to_file_for_attachment(date)
     return unless date.present?
 
-    @output.puts "attachement.date = \"#{date.strftime('%Y-%m-%d')}\""
+    @output.puts "attachment.date = \"#{date.strftime('%Y-%m-%d')}\""
   end
 
   ATTACHMENT_IMPORTER_TEMPLATE = ERB.new(<<~RUBY)
     puts "Inserting <%= get_attachment_type(data[:path]) %> to <%= data[:record_id] >"
-    attachement = Attachment.new(<%= data.except(:path, :field_name, :date) %>)
-    <% if date.present? %>attachement.date = "<%= date.strftime('%Y-%m-%d') %>"<% end %>
-    attachement.record_type = <%= data[:record_type] %>
-    attachement.attachment_type = "<%= get_attachment_type(path) %>"
-    attachement.field_name = "<%= get_field_name(form_name) %>"
-    attachement.file.attach(io: File.open("\#{File.dirname(__FILE__)}<%= data[:path] %>"), filename: <%= data[:file_name].inspect %>)
+    attachment = Attachment.new(<%= data.except(:path, :field_name, :date) %>)
+    <% if date.present? %>attachment.date = "<%= date.strftime('%Y-%m-%d') %>"<% end %>
+    attachment.record_type = <%= data[:record_type] %>
+    attachment.attachment_type = "<%= get_attachment_type(path) %>"
+    attachment.field_name = "<%= get_field_name(form_name) %>"
+    attachment.file.attach(io: File.open("\#{File.dirname(__FILE__)}<%= data[:path] %>"), filename: <%= data[:file_name].inspect %>)
     begin
-      attachement.save!
+      attachment.save!
     rescue StandardError => e
       puts "Cannot attach <%= data[:file_name].inspect %>. Error \#{e.message}"
     end
