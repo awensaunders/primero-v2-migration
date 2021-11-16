@@ -163,7 +163,7 @@ class AttachmentExporter < DataExporter
     attachment = Attachment.new(<%= data.except(:path, :field_name, :date) %>)
     <% if data[:date].present? %>attachment.date = "<%= data[:date].strftime('%Y-%m-%d') %>"<% end %>
     attachment.record_type = <%= data[:record_type] %>
-    attachment.attachment_type = "<%= get_attachment_type(path) %>"
+    attachment.attachment_type = "<%= get_attachment_type(data[:path]) %>"
     attachment.field_name = "<%= get_field_name(form_name) %>"
     attachment.file.attach(io: File.open("\#{File.dirname(__FILE__)}<%= data[:path] %>"), filename: <%= data[:file_name].inspect %>)
     begin
