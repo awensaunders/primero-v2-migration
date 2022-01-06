@@ -29,42 +29,7 @@ class LookupConfigExporter < ConfigurationExporter
 
   def config_objects(_config_name)
     config_objects = Lookup.all.map { |object| configuration_hash_lookup(object) }
-
-    config_objects.each_with_index.map { |lookup, index|
-      lookup.keys.each do |key|
-        m = key.match(/(name|lookup_values)_(.*)/)
-        next unless m
-        new_key = m[1].to_s.concat('_i18n')
-        lang = m[2].gsub('_', '-')
-        if new_key == 'name_i18n'
-          config_objects[index][new_key] = {} unless config_objects[index].has_key?(new_key)
-          config_objects[index][new_key][lang] = config_objects[index][key].nil? ? "" : config_objects[index].delete(key)
-        elsif new_key == 'lookup_values_i18n'
-          lookup_values = config_objects[index].delete(key)
-          next unless lookup_values
-
-          if !config_objects[index].key?(new_key)
-            config_objects[index][new_key] = []
-          end
-
-          lookup_values.each do |value|
-            value_index = config_objects[index][new_key].index { |item| item['id'] == value['id'] }
-            if value_index.nil?
-              new_value = {}
-              new_value['id'] = value['id']
-              new_value['display_text'] = {}
-              new_value['display_text'][lang] = value['display_text']
-
-              config_objects[index][new_key].append(new_value)
-            else
-              config_objects[index][new_key][value_index]['display_text'][lang] = value['display_text']
-            end
-          end
-        end
-      end
-    }
-
-
+    migrate_config_translation_fields(config_objects)
     config_objects + default_lookups
   end
 

@@ -108,6 +108,54 @@ class ConfigurationExporter
     ruby_string + "\n#{i})\n\n"
   end
 
+  def migrate_config_translation_fields(config_hash)
+    translation_fields = [
+      'description',
+      'display_name',
+      'guiding_questions',
+      'help_text',
+      'name',
+      'tick_box_label',
+      'option_strings_text',
+      'lookup_values'
+    ]
+    fields_attributes
+
+    config_objects.each_with_index.map { |lookup, index|
+      lookup.keys.each do |key|
+        m = key.match(/#{translation_fields.join('|')}_(.*)/)
+        next unless m
+        new_key = m[1].to_s.concat('_i18n')
+        lang = m[2].gsub('_', '-')
+        object_kind_a
+        if !config_objects[index][key].kind_of?(Array)
+          config_objects[index][new_key] = {} unless config_objects[index].key?(new_key)
+          config_objects[index][new_key][lang] = config_objects[index][key].nil? ? "" : config_objects[index].delete(key)
+          next
+        end
+
+        lookup_values = config_objects[index].delete(key)
+        next unless lookup_values
+
+        config_objects[index][new_key] = [] unless config_objects[index].key?(new_key)
+
+        lookup_values.each do |value|
+          value_index = config_objects[index][new_key].index { |item| item['id'] == value['id'] }
+          if value_index.nil?
+            new_value = {}
+            new_value['id'] = value['id']
+            new_value['display_text'] = {}
+            new_value['display_text'][lang] = value['display_text']
+
+            config_objects[index][new_key].append(new_value)
+          else
+            config_objects[index][new_key][value_index]['display_text'][lang] = value['display_text']
+          end
+        end
+      end
+    }
+  end
+
   def array_value_to_ruby_string(value)
     return '[]' if value.blank?
 

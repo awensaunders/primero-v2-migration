@@ -29,7 +29,7 @@ class FormConfigExporter < ConfigurationExporter
         'type' => 'tick_box',
         'tick_box_label_en' => 'Yes',
         'visible' => false,
-        'display_name' => {
+        'display_name_i18n' => {
           'en' =>  'Is this a referral to an external system / user?'
         }
       },
@@ -37,7 +37,7 @@ class FormConfigExporter < ConfigurationExporter
         'name' => 'service_external_referral_header',
         'type' => 'separator',
         'visible' => false,
-        'display_name' => {
+        'display_name_i18n' => {
           'en' => 'External referral details'
         }
       },
@@ -45,7 +45,7 @@ class FormConfigExporter < ConfigurationExporter
         'name' => 'service_provider',
         'type' => 'text_field',
         'visible' => false,
-        'display_name' => {
+        'display_name_i18n' => {
           'en' => 'Service Provider'
         }
       },
@@ -53,7 +53,7 @@ class FormConfigExporter < ConfigurationExporter
         'name' => 'service_implementing_agency_external',
         'type' => 'text_field',
         'visible' => false,
-        'display_name' => {
+        'display_name_i18n' => {
           'en' => 'Implementing Agency'
         }
       },
@@ -61,7 +61,7 @@ class FormConfigExporter < ConfigurationExporter
         'name' => 'service_location',
         'type' => 'text_field',
         'visible' => false,
-        'display_name' => {
+        'display_name_i18n' => {
           'en' => 'Service Location'
         }
       }
@@ -83,8 +83,10 @@ class FormConfigExporter < ConfigurationExporter
       'guiding_questions_',
       'help_text_',
       'name_',
-      'option_strings_text_',
       'tick_box_label_'
+    ]
+    translation_array_fields = [
+      'option_strings_text_',
     ]
     config_hash.keys.each do |k|
       translation_fields.each do |t|
@@ -98,6 +100,7 @@ class FormConfigExporter < ConfigurationExporter
         end
       end
     end
+    migrate_config_translation_fields(config_hash)
 
     config_hash['collapsed_field_names'] = replace_renamed_field_names(object.collapsed_fields) if object.collapsed_fields.present?
     config_hash['fields_attributes'] = object.fields.map do |field|
