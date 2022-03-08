@@ -162,9 +162,9 @@ class UsersExporter
   end
 
   def migrate_user_locale(user)
-    return if @locale_hash.blank? || user.locale.blank?
-
-    user.locale = @locale_hash[user.locale] || user.locale
+    if @locale_hash.present? || user.locale.present?
+      user.locale = @locale_hash[user.locale] || user.locale
+    end
     user
   end
 
