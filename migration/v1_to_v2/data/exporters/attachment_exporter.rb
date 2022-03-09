@@ -194,7 +194,7 @@ class AttachmentExporter < DataExporter
      end
 
      attachments.each_slice(10) do |slice|
-       slice.each do |form, file|
+       slice.each do |form_name, data|
          @output.puts ATTACHMENT_IMPORTER_TEMPLATE.result(binding)
        end
 
