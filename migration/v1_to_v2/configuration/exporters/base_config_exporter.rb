@@ -90,7 +90,7 @@ class BaseConfigExporter < ConfigurationExporter
 
   def configuration_hash_export_configuration(object)
     config_hash = object.attributes.except('id').with_indifferent_access
-    config_hash['unique_id'] = "export-#{object&.export_id&.dasherize}"
+    config_hash['unique_id'] = "export-#{object.export_id.dasherize if object && object.export_id}"
     config_hash
   end
 

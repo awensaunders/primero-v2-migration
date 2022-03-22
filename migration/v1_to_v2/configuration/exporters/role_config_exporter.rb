@@ -143,13 +143,14 @@ class RoleConfigExporter < ConfigurationExporter
   end
 
   def permission_actions_dashboard_approval(opts = {})
+    return [] unless opts.key?(:case_permissions)
     actions = []
-    actions << 'approvals_assessment' if opts[:case_permissions]&.include?('request_approval_bia')
-    actions << 'approvals_assessment_pending' if opts[:case_permissions]&.include?('approve_bia')
-    actions << 'approvals_case_plan' if opts[:case_permissions]&.include?('request_approval_case_plan')
-    actions << 'approvals_case_plan_pending' if opts[:case_permissions]&.include?('approve_case_plan')
-    actions << 'approvals_closure' if opts[:case_permissions]&.include?('request_approval_closure')
-    actions << 'approvals_closure_pending' if opts[:case_permissions]&.include?('approve_closure')
+    actions << 'approvals_assessment' if opts[:case_permissions].include?('request_approval_bia')
+    actions << 'approvals_assessment_pending' if opts[:case_permissions].include?('approve_bia')
+    actions << 'approvals_case_plan' if opts[:case_permissions].include?('request_approval_case_plan')
+    actions << 'approvals_case_plan_pending' if opts[:case_permissions].include?('approve_case_plan')
+    actions << 'approvals_closure' if opts[:case_permissions].include?('request_approval_closure')
+    actions << 'approvals_closure_pending' if opts[:case_permissions].include?('approve_closure')
     actions
   end
 
@@ -171,10 +172,12 @@ class RoleConfigExporter < ConfigurationExporter
 
   def permission_actions_dashboard_form_dependent(actions, opts = {})
     forms = role_forms(opts[:permitted_form_ids])
-    form_ids = forms&.values&.flatten&.map(&:unique_id)
-    field_names = forms&.map do |_, v|
+    form_ids = forms.values.flatten.map(&:unique_id) if forms && forms.values && forms.values.flatten
+    field_names = forms.map do |_, v|
       v.map { |form| form.fields.map { |field| field.name if field.visible? } }
-    end&.flatten&.compact
+    end
+
+    field_names = field_names.flatten.compact if field_names && field_names.flatten
     new_actions = []
     new_actions += permission_actions_dashboard_overview(form_ids, opts)
     new_actions += permission_actions_dashboard_task_overdue(actions, field_names)
@@ -207,7 +210,7 @@ class RoleConfigExporter < ConfigurationExporter
 
     return false unless opts[:group_permission] == 'self'
 
-    opts[:module_unique_ids].any? { |module_id| @module_hash[module_id]&.use_workflow_service_implemented }
+    opts[:module_unique_ids].any? { |module_id| @module_hash[module_id].use_workflow_service_implemented if @module_hash.key:(module_id) }
   end
 
   def permission_actions_dashboard(actions, opts = {})
@@ -248,13 +251,15 @@ class RoleConfigExporter < ConfigurationExporter
   end
 
   def case_permissions(permissions)
-    permissions.select { |p| p.resource == 'case' }.first&.actions
+    result = permissions.select { |p| p.resource == 'case' }
+    result.first.actions if result.first
   end
 
   def add_incident_from_case?(permissions, permission, opts = {})
     return false unless permission.resource == 'case' && permissions.map(&:resource).exclude?('incident')
 
-    opts[:role_form_ids]&.include?('incident_details_container') ? true : false
+    return true if opts.key?(:role_form_ids) && opts[:role_form_ids].include?('incident_details_container')
+    false
   end
 
   def incident_permissions_from_case(case_permission)
